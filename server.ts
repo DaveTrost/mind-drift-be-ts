@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import app from './lib/app';
-// import connect from './lib/utils/connect';
+import connect from './lib/utils/connect';
 
-// connect();
+connect();
 
 dotenv.config();
 const PORT = process.env.PORT || 7891;

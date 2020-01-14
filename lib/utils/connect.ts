@@ -1,7 +1,10 @@
-const mongoose = require('mongoose');
-const { parse } = require('url');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import { parse } from 'url';
 
-module.exports = (url = process.env.MONGODB_URI) => {
+dotenv.config();
+
+export default (url = process.env.MONGODB_URI): void => {
   mongoose.connect(url, {
     useCreateIndex: true,
     useNewUrlParser: true,
