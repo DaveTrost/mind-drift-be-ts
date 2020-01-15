@@ -11,7 +11,7 @@ app.use(cors());
 // app.use('/api/v1', require('./routes/users'));
 // app.use('/api/v1', require('./routes/aggregations/sessionAggs'));
 
-// app.use(require('./middleware/not-found'));
+app.use(require('./middleware/not-found'));
 // app.use(require('./middleware/error'));
 
 export default app;

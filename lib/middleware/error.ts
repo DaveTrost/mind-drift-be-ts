@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import { Request, Response, NextFunction } from 'express';
 
-// eslint-disable-next-line no-unused-vars
-module.exports = (err, req, res, next) => {
+function errorMiddleware(err: mongoose.Error, req: Request, res: Response, next: NextFunction): void {
   let status = err.status || 500;
 
   if(err instanceof mongoose.Error.ValidationError ||
@@ -18,3 +18,5 @@ module.exports = (err, req, res, next) => {
     message: err.message
   });
 };
+
+export default errorMiddleware
