@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { Request, Response, NextFunction } from 'express';
 
-function errorMiddleware(err: mongoose.Error, req: Request, res: Response, next: NextFunction): void {
+export default (err: mongoose.Error, req: Request, res: Response, next: NextFunction): void => {
   let status = err.status || 500;
 
   if(err instanceof mongoose.Error.ValidationError ||
@@ -18,5 +18,3 @@ function errorMiddleware(err: mongoose.Error, req: Request, res: Response, next:
     message: err.message
   });
 };
-
-export default errorMiddleware
