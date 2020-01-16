@@ -3,18 +3,20 @@ import { Request, Response, NextFunction } from 'express';
 
 export default (err: mongoose.Error, req: Request, res: Response, next: NextFunction): void => {
   let status = err.status || 500;
+  let error = 'Internal Server Error';
 
   if(err instanceof mongoose.Error.ValidationError ||
     err instanceof mongoose.Error.CastError) {
     status = 400;
+    error = err.message;
+  }
+  else if(err.statusCode) {
+    status = err.statusCode;
+    error = err.error;
+  }
+  else {
+    console.log('UNEXPECTED ERROR', err);
   }
 
-  res.status(status);
-
-  console.log(err);
-
-  res.send({
-    status,
-    message: err.message
-  });
+  res.status(status).send({ error });
 };

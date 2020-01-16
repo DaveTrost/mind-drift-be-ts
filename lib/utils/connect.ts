@@ -4,7 +4,7 @@ import { parse } from 'url';
 
 dotenv.config();
 
-export default (url = process.env.MONGODB_URI): void => {
+export default (url = process.env.MONGODB_URI, options = { log: true }): void => {
   mongoose.connect(url, {
     useCreateIndex: true,
     useNewUrlParser: true,
@@ -13,16 +13,22 @@ export default (url = process.env.MONGODB_URI): void => {
   });
 
   mongoose.connection.on('connected', () => {
-    const parsedUrl = parse(url);
-    const redactedUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}:${parsedUrl.port}${parsedUrl.pathname}`;
-    console.log(`Connected to MongoDB at ${redactedUrl}`);
+    if(options.log !== false) {
+      const parsedUrl = parse(url);
+      const redactedUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}:${parsedUrl.port}${parsedUrl.pathname}`;
+      console.log(`Connected to MongoDB at ${redactedUrl}`);
+    }
   });
 
   mongoose.connection.on('disconnected', () => {
-    console.log('Disconnected from MongoDB');
+    if(options.log !== false) {
+      console.log('Disconnected from MongoDB');
+    }
   });
 
   mongoose.connection.on('error', () => {
-    console.log('Error connecting to MongoDB');
+    if(options.log !== false) {
+      console.log('Error connecting to MongoDB');
+    }
   });
 };
