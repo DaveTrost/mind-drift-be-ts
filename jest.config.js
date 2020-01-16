@@ -1,4 +1,6 @@
 module.exports = {
+  'testEnvironment': 'node',
+  'preset': '@shelf/jest-mongodb',
   'roots': [
     '<rootDir>/lib',
     '<rootDir>/e2e'

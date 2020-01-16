@@ -10,10 +10,6 @@
     "start": "tsc && node dist/server.js",
     "start:watch": "nodemon -e ts --exec \"npm run start\""
   },
-  "jest": {
-    "testEnvironment": "node",
-    "preset": "@shelf/jest-mongodb"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
