@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+import { Schema, model } from 'mongoose';
 
 const schema = new Schema({
   start: {
@@ -50,4 +50,4 @@ schema.static('totalSessionTime', function(userId) {
 });
 
 
-module.exports = model('Sessions', schema);
+export default model('Sessions', schema);
