@@ -5,11 +5,10 @@ import request from '../request';
 import connect from '../../lib/utils/connect';
 
 dotenv.config();
-const MONGODB_URI = process.env.MONGODB_URI;
 
 describe('app routes', () => {
   beforeAll(() => {
-    return connect(MONGODB_URI, { log: false });
+    return connect(process.env.MONGODB_URI, { log: false });
   });
 
   afterAll(() => {
