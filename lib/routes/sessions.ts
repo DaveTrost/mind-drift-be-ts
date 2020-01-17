@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import Session from '../models/Session';
+import { Session } from '../models/Session';
 
 // const User = require('../models/User');
 // const Achievement = require('../models/Achievement');

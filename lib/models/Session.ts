@@ -1,6 +1,12 @@
-import { Schema, model } from 'mongoose';
+import { Document, Schema, Model, model } from 'mongoose';
+import { sessionInterface } from '../interfaces/sessionInterface';
 
-const schema = new Schema({
+interface sessionModel extends sessionInterface, Document {}
+//   averageSessionTime(): number;
+//   totalSessionTime(): number;
+// }
+
+const sessionSchema: Schema = new Schema({
   start: {
     type: Date,
     required: true,
@@ -15,39 +21,34 @@ const schema = new Schema({
   }
 });
 
-schema.static('averageSessionTime', function(userId) {
-  const pipeline = 
-  [{
-    $match: {
-      userId: userId
-    }
-  }, {
-    $group: {
-      _id: null,
-      averageTime: {
-        $avg: '$duration'
+sessionSchema.static('averageSessionTime', function(userId: string) {
+  const pipeline = [
+    {
+      $match: { userId: userId }
+    }, 
+    {
+      $group: {
+        _id: null,
+        averageTime: { $avg: '$duration' }
       }
     }
-  }];
+  ];
   return this.aggregate(pipeline);
 });
 
-schema.static('totalSessionTime', function(userId) {
-  const pipeline = 
-  [{
-    $match: {
-      userId: userId
-    }
-  }, {
-    $group: {
-      _id: null,
-      totalTime: {
-        $sum: '$duration'
+sessionSchema.static('totalSessionTime', function(userId: string) {
+  const pipeline = [
+    {
+      $match: { userId: userId }
+    }, 
+    {
+      $group: {
+        _id: null,
+        totalTime: { $sum: '$duration' }
       }
     }
-  }];
+  ];
   return this.aggregate(pipeline);
 });
 
-
-export default model('Sessions', schema);
+export const Session: Model<sessionModel> = model<sessionModel>('Sessions', sessionSchema);
