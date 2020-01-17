@@ -60,16 +60,16 @@ describe('Sessions', () => {
       });
   });
 
-  // it('gets a session', () => {
-  //   return postSession(session)
-  //     .then(() => {
-  //       return request.get('/api/v1/sessions?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body.length).toBe(1);
-  //       expect(body[0].duration).toBe(16);
-  //     });
-  // });
+  it('gets a session', () => {
+    return postSession(session)
+      .then(() => {
+        return request.get('/api/v1/sessions?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(1);
+        expect(body[0].duration).toBe(16);
+      });
+  });
 
   // it('posts a session and a user', () => {
   //   return postSession(session)
