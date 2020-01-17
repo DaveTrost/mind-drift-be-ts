@@ -1,7 +1,13 @@
 import mongoose from 'mongoose';
 import { Request, Response, NextFunction } from 'express';
 
-export default (err: mongoose.Error, req: Request, res: Response, next: NextFunction): void => {
+interface ResponseError extends Error {
+  status?: number;
+  statusCode?: number;
+  error?: string;
+}
+
+export default (err: ResponseError, req: Request, res: Response, next: NextFunction): void => {
   let status = err.status || 500;
   let error = 'Internal Server Error';
 
