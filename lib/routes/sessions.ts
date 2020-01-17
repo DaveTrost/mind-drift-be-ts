@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { Session } from '../models/Session';
+import Session from '../models/Session';
+import User from '../models/User';
 
-// const User = require('../models/User');
 // const Achievement = require('../models/Achievement');
 
 export default Router()
@@ -18,6 +18,7 @@ export default Router()
     Session
       .create({ start, duration, userId, moods })
       .then((session: object) => res.send(session))
+      .then(() => User.schema.statics.updateStreak(userId, start))
       .catch(next);
   });
 
