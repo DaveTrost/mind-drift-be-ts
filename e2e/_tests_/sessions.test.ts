@@ -141,7 +141,7 @@ describe('Sessions', () => {
       });
   });
 
-  it('gets average session time', () => {
+  it('gets average session time for a user', () => {
     return postSession(session)
       .then(() => {
         return postSession(session2);
@@ -154,15 +154,18 @@ describe('Sessions', () => {
       });
   });
 
-  // it('gets total session time', () => {
-  //   return postSession(session)
-  //     .then(() => {
-  //       return request.get('/api/v1/total?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body[0].totalTime).toBe(16);
-  //     });
-  // });
+  it('gets total session time for a user', () => {
+    return postSession(session)
+      .then(() => {
+        return postSession(session2);
+      })
+      .then(() => {
+        return request.get('/api/v1/users/totalTime?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body[0].totalTime).toBe(40);
+      });
+  });
 
   it('should get a 400', () => {
     return request
