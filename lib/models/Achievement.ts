@@ -1,7 +1,16 @@
-const { Schema, model } = require('mongoose');
-const masterAchievementsList = require('../data/achievementsList');
+import { Schema, Model, model } from 'mongoose';
+import masterAchievementsList from '../data/achievementsList';
+import { IAchievementDocument } from '../interfaces/IAchievementDocument';
+import { IUserDocument } from '../interfaces/IUserDocument';
 
-const schema = new Schema({
+interface IAchievement extends IAchievementDocument {};
+
+interface IAchievementModel extends Model<IAchievement> {
+  updateUser(user: IUserDocument): Promise<IAchievementDocument[]>;
+  markAsDelivered(userId: string): Promise<void>;
+}
+
+export const achievementSchema: Schema = new Schema({
   name: {
     type: String,
     enum: ['First Steps', '2-Day Streak', '5-Day Streak', '10-Day Streak', '25-Day Streak', '50-Day Streak'],
@@ -29,10 +38,10 @@ const schema = new Schema({
   }
 });
 
-schema.static ('updateUser', async function(user) {
+achievementSchema.static ('updateUser', async function(user: IUserDocument): Promise<IAchievementDocument[]> {
   const { userId, currentStreak } = user;
 
-  const userAchievements = await this.find({ userId });
+  const userAchievements = await Achievement.find({ userId });
   const oldAchievementNames = userAchievements.map(({ name }) => name);
 
   const newAchievements = masterAchievementsList
@@ -49,14 +58,15 @@ schema.static ('updateUser', async function(user) {
       delivered: false 
     }));
 
-  return await this.insertMany(newAchievements);
+  return await Achievement.insertMany(newAchievements);
 }); 
 
-schema.static ('markAsDelivered', async function(userId) {
-  return this.updateMany(
+achievementSchema.static ('markAsDelivered', async function(userId: string): Promise<void> {
+  return Achievement.updateMany(
     { userId, delivered: false },
     { $set: { delivered: true } }
   );
 }); 
 
-module.exports = model('Achievements', schema);
+export const Achievement: IAchievementModel = model<IAchievement, IAchievementModel>('Achievements', achievementSchema);
+export default Achievement;
