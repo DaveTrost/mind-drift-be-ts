@@ -144,6 +144,9 @@ describe('Sessions', () => {
   it('gets average session time', () => {
     return postSession(session)
       .then(() => {
+        return postSession(session2);
+      })
+      .then(() => {
         return request.get('/api/v1/average?userId=123456').expect(200);
       })
       .then(({ body }) => {
