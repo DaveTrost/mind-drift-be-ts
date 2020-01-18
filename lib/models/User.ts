@@ -24,9 +24,9 @@ export const userSchema: Schema = new Schema({
 });
 
 userSchema.static('updateStreak', async function(userId: string, start: Date): Promise<IUserDocument> {
-  const users = await this.find({ userId });
+  const users = await User.find({ userId });
   if(!users.length) {
-    return this.create({ userId, lastSessionDate: start, currentStreak: 1 });
+    return User.create({ userId, lastSessionDate: start, currentStreak: 1 });
   }
 
   let { lastSessionDate, currentStreak } = users[0];
@@ -41,7 +41,7 @@ userSchema.static('updateStreak', async function(userId: string, start: Date): P
     default:
       currentStreak = 1;
   }
-  return this.findOneAndUpdate(
+  return User.findOneAndUpdate(
     { userId }, 
     { userId, lastSessionDate: start, currentStreak }, 
     { new: true }
