@@ -1,11 +1,11 @@
-import { Schema, Model, model } from 'mongoose';
+import { Schema, Model, model, Aggregate } from 'mongoose';
 import { ISessionDocument } from '../interfaces/ISessionDocument';
 
 interface ISession extends ISessionDocument {};
 
 interface ISessionModel extends Model<ISession> {
-  averageSessionTime(userId: String): number;
-  totalSessionTime(userId: String): number;
+  averageSessionTime(userId: String): Promise<number>;
+  totalSessionTime(userId: String): Promise<number>;
 }
 
 export const sessionSchema: Schema = new Schema({
@@ -23,7 +23,7 @@ export const sessionSchema: Schema = new Schema({
   }
 });
 
-sessionSchema.static('averageSessionTime', function(userId: string): number {
+sessionSchema.static('averageSessionTime', function(userId: string): Aggregate<ISessionDocument[]> {
   const pipeline = [
     {
       $match: { userId: userId }
@@ -35,10 +35,10 @@ sessionSchema.static('averageSessionTime', function(userId: string): number {
       }
     }
   ];
-  return this.aggregate(pipeline);
+  return Session.aggregate(pipeline);
 });
 
-sessionSchema.static('totalSessionTime', function(userId: string): number {
+sessionSchema.static('totalSessionTime', function(userId: string): Promise<number> {
   const pipeline = [
     {
       $match: { userId: userId }
