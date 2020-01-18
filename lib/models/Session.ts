@@ -38,7 +38,7 @@ sessionSchema.static('averageSessionTime', function(userId: string): Aggregate<I
   return Session.aggregate(pipeline);
 });
 
-sessionSchema.static('totalSessionTime', function(userId: string): Promise<number> {
+sessionSchema.static('totalSessionTime', function(userId: string): Aggregate<ISessionDocument[]> {
   const pipeline = [
     {
       $match: { userId: userId }
@@ -50,7 +50,7 @@ sessionSchema.static('totalSessionTime', function(userId: string): Promise<numbe
       }
     }
   ];
-  return this.aggregate(pipeline);
+  return Session.aggregate(pipeline);
 });
 
 export const Session: ISessionModel = model<ISession, ISessionModel>('Session', sessionSchema);
