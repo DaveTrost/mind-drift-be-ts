@@ -23,7 +23,7 @@ describe('Sessions', () => {
   };
   const session2 = {
     start: moment(new Date()).add(1, 'days'),
-    duration: 16,
+    duration: 24,
     userId: '123456'
   };
   const fake = {
@@ -141,15 +141,15 @@ describe('Sessions', () => {
       });
   });
 
-  // it('gets average session time', () => {
-  //   return postSession(session)
-  //     .then(() => {
-  //       return request.get('/api/v1/average?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body[0].averageTime).toBe(16);
-  //     });
-  // });
+  it('gets average session time', () => {
+    return postSession(session)
+      .then(() => {
+        return request.get('/api/v1/average?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body[0].averageTime).toBe(20);
+      });
+  });
 
   // it('gets total session time', () => {
   //   return postSession(session)
