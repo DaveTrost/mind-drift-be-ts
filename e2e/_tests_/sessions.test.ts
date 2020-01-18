@@ -71,30 +71,29 @@ describe('Sessions', () => {
       });
   });
 
-  // it('posts a session and a user', () => {
-  //   return postSession(session)
-  //     .then(() => {
-  //       return request.get('/api/v1/users?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  
-  //       expect(body[0]).toMatchInlineSnapshot(
-  //         {
-  //           _id: expect.any(String),
-  //           lastSessionDate: expect.any(String)
-  //         },
-  //         `
-  //         Object {
-  //           "__v": 0,
-  //           "_id": Any<String>,
-  //           "currentStreak": 1,
-  //           "lastSessionDate": Any<String>,
-  //           "userId": "123456",
-  //         }
-  //       `
-  //       );
-  //     });
-  // });
+  it('finds a user after the session is posted', () => {
+    return postSession(session)
+      .then(() => {
+        return request.get('/api/v1/users?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body[0]).toMatchInlineSnapshot(
+          {
+            _id: expect.any(String),
+            lastSessionDate: expect.any(String)
+          },
+          `
+            Object {
+              "__v": 0,
+              "_id": Any<String>,
+              "currentStreak": 1,
+              "lastSessionDate": Any<String>,
+              "userId": "123456",
+            }
+          `
+        );
+      });
+  });
 
   // it('post sessions and get new achievements', () => {
   //   return postSession(session)
