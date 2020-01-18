@@ -1,10 +1,9 @@
-const { Router } = require('express');
-const Achievement = require('../models/Achievement');
+import { Router, Request, Response, NextFunction } from 'express';
+import { Achievement } from '../models/Achievement';
 
-module.exports = Router()
-  .get('/achievements/new', ({ query }, res, next) => {
+export default Router()
+  .get('/achievements/new', ({ query }: Request, res: Response, next: NextFunction) => {
     const { userId } = query;
-    
     Achievement
       .find({ userId, delivered: false })
       .sort({ created: 'desc' })
@@ -12,10 +11,9 @@ module.exports = Router()
       .then(() => Achievement.markAsDelivered(userId))
       .catch(next);
   })
-    
-  .get('/achievements', ({ query }, res, next) => {
+
+  .get('/achievements', ({ query }: Request, res: Response, next: NextFunction) => {
     const { userId } = query;
-      
     Achievement
       .find({ userId })
       .sort({ created: 'desc' })
