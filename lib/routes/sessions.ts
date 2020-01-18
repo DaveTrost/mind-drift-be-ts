@@ -2,8 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import Session from '../models/Session';
 import User from '../models/User';
 import { ISessionDocument } from '../interfaces/ISessionDocument';
-
-// const Achievement = require('../models/Achievement');
+import { Achievement } from '../models/Achievement';
 
 export default Router()
   .get('/sessions', ({ query }: Request, res: Response, next: NextFunction) => {
@@ -20,15 +19,6 @@ export default Router()
       .create({ start, duration, userId, moods })
       .then((session: ISessionDocument) => res.send(session))
       .then(() => User.schema.statics.updateStreak(userId, start))
+      .then(user => Achievement.schema.statics.updateUser(user))
       .catch(next);
   });
-
-// .post('/sessions', (req, res, next) => {
-//   const { start, duration, userId, moods } = req.body;
-//   Session
-//     .create({ start, duration, userId, moods })
-//     .then(session => res.send(session))
-//     .then(() => User.updateStreak(userId, start))
-//     .then(user => Achievement.updateUser(user))
-//     .catch(next);
-// });
