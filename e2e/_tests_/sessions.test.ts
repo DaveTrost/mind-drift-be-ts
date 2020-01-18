@@ -10,7 +10,10 @@ describe('Sessions', () => {
   beforeAll(() => {
     return connect(process.env.MONGODB_URI, { log: false });
   });
-  beforeEach(() => dropCollection('sessions'));
+  beforeEach(() => {
+    dropCollection('sessions');
+    dropCollection('achievements');
+  });
   afterAll(() => dropDatabase());
 
   const session = {
@@ -18,11 +21,11 @@ describe('Sessions', () => {
     duration: 16,
     userId: '123456'
   };
-  // const session2 = {
-  //   start: moment(new Date()).add(1, 'days'),
-  //   duration: 16,
-  //   userId: '123456'
-  // };
+  const session2 = {
+    start: moment(new Date()).add(1, 'days'),
+    duration: 16,
+    userId: '123456'
+  };
   const fake = {
     start: true,
     duration: {},
@@ -95,45 +98,50 @@ describe('Sessions', () => {
       });
   });
 
-  // it('post sessions and get new achievements', () => {
-  //   return postSession(session)
-  //     .then(() => {
-  //       return postSession(session2);
-  //     })
-  //     .then(() => {
-  //       return request.get('/api/v1/users?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body.length).toBeLessThanOrEqual(2);
-  //     })
-  //     .then(() => {
-  //       return request.get('/api/v1/achievements/new?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body[0].delivered).toBe(false);
-  //     });
-  // });
+  it('posts 2 sessions and gets new achievements', () => {
+    return postSession(session)
+      .then(() => {
+        return postSession(session2);
+      })
+      .then(() => {
+        return request.get('/api/v1/users?userId=123456').expect(200);
+      })
+      .then(() => {
+        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBeLessThanOrEqual(2);
+        expect(body[0].delivered).toBe(false);
+      });
+  });
 
-  // it('post sessions and get achievements', () => {
-  //   return postSession(session)
-  //     .then(() => {
-  //       return postSession(session2);
-  //     })
-  //     .then(() => {
-  //       return request.get('/api/v1/users?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body.length).toBeLessThanOrEqual(2);
-  //     })
-  //     .then(() => {
-  //       return request.get('/api/v1/achievements?userId=123456').expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body[0].delivered).toBe(false);
-  //     });
-  // });
+  it('posts 2 sessions, gets new achievements, gets all achievements', () => {
+    return postSession(session)
+      .then(() => {
+        return postSession(session2);
+      })
+      .then(() => {
+        return request.get('/api/v1/users?userId=123456').expect(200);
+      })
+      .then(() => {
+        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+      })
+      .then(() => {
+        return request.get('/api/v1/achievements?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBeLessThanOrEqual(2);
+        expect(body[0].delivered).toBe(true);
+      })
+      .then(() => {
+        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(0);
+      });
+  });
 
-  // it('gets average', () => {
+  // it('gets average session time', () => {
   //   return postSession(session)
   //     .then(() => {
   //       return request.get('/api/v1/average?userId=123456').expect(200);
@@ -143,7 +151,7 @@ describe('Sessions', () => {
   //     });
   // });
 
-  // it('gets total', () => {
+  // it('gets total session time', () => {
   //   return postSession(session)
   //     .then(() => {
   //       return request.get('/api/v1/total?userId=123456').expect(200);
