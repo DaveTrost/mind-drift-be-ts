@@ -14,5 +14,10 @@ export default Router()
     Session.schema.statics.averageSessionTime(userId)
       .then((avg: number) => res.json(avg))
       .catch(next);
-  });
-  
+  })
+  .get('/users/totalTime', ({ query }: Request, res: Response, next: NextFunction) => {
+    const { userId } = query;
+    Session.schema.statics.totalSessionTime(userId)
+      .then((total: number) => res.json(total))
+      .catch(next);
+  })
