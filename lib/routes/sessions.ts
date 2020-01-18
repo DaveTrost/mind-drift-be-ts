@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Session from '../models/Session';
 import User from '../models/User';
+import { ISessionDocument } from '../interfaces/ISessionDocument';
 
 // const Achievement = require('../models/Achievement');
 
@@ -9,7 +10,7 @@ export default Router()
     const userQuery: object = query.userId && { userId: query.userId };
     Session
       .find(userQuery || {})
-      .then((sessions: object[]) => res.send(sessions))
+      .then((sessions: ISessionDocument[]) => res.send(sessions))
       .catch(next);
   })
 
@@ -17,7 +18,7 @@ export default Router()
     const { start, duration, userId, moods } = req.body;
     Session
       .create({ start, duration, userId, moods })
-      .then((session: object) => res.send(session))
+      .then((session: ISessionDocument) => res.send(session))
       .then(() => User.schema.statics.updateStreak(userId, start))
       .catch(next);
   });
