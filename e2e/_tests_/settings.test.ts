@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import request from '../request';
 import connect from '../../lib/utils/connect';
 import { dropCollection, dropDatabase, closeConnection } from '../db';
+import { ISettingDocument } from '../../lib/interfaces/ISettingDocument';
 
 dotenv.config();
 
@@ -48,7 +49,7 @@ describe('Settings', () => {
     endTime: 16
   };
 
-  function postSettings(settings) {
+  function postSettings(settings: object) {
     return request
       .post('/api/v1/settings')
       .send(settings)
@@ -58,7 +59,7 @@ describe('Settings', () => {
 
   it('posts settings', () => {
     return postSettings(settings1)
-      .then((body) => {
+      .then((body: object) => {
         expect(body).toMatchInlineSnapshot(
           {
             ...settings1,
@@ -82,72 +83,72 @@ describe('Settings', () => {
       });
   });
 
-  // it('gets settings', () => {
-  //   return postSettings(settings1)
-  //     .then(() => {
-  //       return request
-  //         .get('/api/v1/settings?userId=5689')
-  //         .expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body.length).toBe(1);
-  //       expect(body[0].title).toBe('Box Breathing');
-  //     });
-  // });
+  it('gets settings', () => {
+    return postSettings(settings1)
+      .then(() => {
+        return request
+          .get('/api/v1/settings?userId=5689')
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(1);
+        expect(body[0].title).toBe('Box Breathing');
+      });
+  });
 
-  // it('gets settings #2', () => {
-  //   return postSettings(settings2)
-  //     .then(() => {
-  //       return request
-  //         .get('/api/v1/settings?userId=123456')
-  //         .expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body.length).toBe(1);
-  //       expect(body[0].title).toBe('Different Breathing Type');
-  //     });
-  // });
+  it('gets settings #2', () => {
+    return postSettings(settings2)
+      .then(() => {
+        return request
+          .get('/api/v1/settings?userId=123456')
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(1);
+        expect(body[0].title).toBe('Different Breathing Type');
+      });
+  });
 
-  // it('returns an empty array when no userId is input to URL', () => {
-  //   return postSettings(settings3)
-  //     .then(() => {
-  //       return request
-  //         .get('/api/v1/settings')
-  //         .expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body.length).toBe(0);
-  //     });
-  // });
+  it('returns an empty array when no userId is input to URL', () => {
+    return postSettings(settings3)
+      .then(() => {
+        return request
+          .get('/api/v1/settings')
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(0);
+      });
+  });
 
-  // it('puts new settings', () => {
-  //   return postSettings(settings1)
-  //     .then(settings => {
-  //       settings.title = 'new title';
-  //       return request
-  //         .put(`/api/v1/settings/${settings._id}`)
-  //         .send(settings)
-  //         .expect(200);
-  //     })
-  //     .then(({ body }) => {
-  //       expect(body.title).toBe('new title');
-  //     });
-  // });
+  it('puts new settings', () => {
+    return postSettings(settings1)
+      .then((settings: ISettingDocument) => {
+        settings.title = 'new title';
+        return request
+          .put(`/api/v1/settings/${settings._id}`)
+          .send(settings)
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.title).toBe('new title');
+      });
+  });
 
-  // it('deletes a setting', () => {
-  //   return postSettings(settings1)
-  //     .then(response => {
-  //       return request
-  //         .delete(`/api/v1/settings/${response._id}`)
-  //         .expect(200)
-  //         .then(() => {
-  //           return request
-  //             .get('/api/v1/settings')
-  //             .expect(200)
-  //             .then(({ body }) => {
-  //               expect(body.length).toBe(0);
-  //             });
-  //         });
-  //     });
-  // });
+  it('deletes a setting', () => {
+    return postSettings(settings1)
+      .then((response: ISettingDocument) => {
+        return request
+          .delete(`/api/v1/settings/${response._id}`)
+          .expect(200)
+          .then(() => {
+            return request
+              .get('/api/v1/settings')
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.length).toBe(0);
+              });
+          });
+      });
+  });
 });
