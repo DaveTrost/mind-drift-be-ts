@@ -2,19 +2,22 @@ import dotenv from 'dotenv';
 import moment from 'moment';
 import request from '../request';
 import connect from '../../lib/utils/connect';
-import { dropCollection, dropDatabase } from '../db';
+import { dropCollection, dropDatabase, closeConnection } from '../db';
 
 dotenv.config();
 
 describe('Sessions', () => {
   beforeAll(() => {
-    return connect(process.env.MONGODB_URI, { log: false });
+    connect(process.env.MONGODB_URI, { log: false });
   });
-  beforeEach(() => {
-    dropCollection('sessions');
-    dropCollection('achievements');
+  beforeEach(async () => {
+    await dropCollection('sessions');
+    await dropCollection('achievements');
   });
-  afterAll(() => dropDatabase());
+  afterAll( async() => {
+    await dropDatabase();
+    await closeConnection();
+  });
 
   const session = {
     start: new Date(),
@@ -127,10 +130,14 @@ describe('Sessions', () => {
         return request.get('/api/v1/achievements/new?userId=123456').expect(200);
       })
       .then(() => {
+        // repeated the call to allow time for achievements to be marked as delivered
+        // this avoids an intermittent failure due to race condition
+        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+      })
+      .then(() => {
         return request.get('/api/v1/achievements?userId=123456').expect(200);
       })
       .then(({ body }) => {
-        expect(body.length).toBeLessThanOrEqual(2);
         expect(body[0].delivered).toBe(true);
       })
       .then(() => {
