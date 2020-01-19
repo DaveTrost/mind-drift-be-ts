@@ -1,22 +1,24 @@
-require('dotenv').config();
-const request = require('../request');
-const connect = require('../../lib/utils/connect');
-const mongoose = require('mongoose');
+import dotenv from 'dotenv';
+import request from '../request';
+import connect from '../../lib/utils/connect';
+import { dropCollection, dropDatabase, closeConnection } from '../db';
+import { ISettingDocument } from '../../lib/interfaces/ISettingDocument';
 
-describe('Settings API', () => {
+dotenv.config();
+
+describe('Settings', () => {
   beforeAll(() => {
-    connect();
+    connect(process.env.MONGODB_URI, { log: false });
+  });
+  beforeEach(async () => {
+    await dropCollection('settings');
+  });
+  afterAll( async() => {
+    await dropDatabase();
+    await closeConnection();
   });
 
-  beforeEach(() => {
-    return mongoose.connection.dropDatabase();
-  });
-
-  afterAll(() => {
-    return mongoose.connection.close();
-  });
-
-  const settings = {
+  const settings1 = {
     userId: '5689',
     title: 'Box Breathing',
     description: 'This is a breathing technique.',
@@ -26,7 +28,6 @@ describe('Settings API', () => {
     holdOut: 4,
     endTime: 126
   };
-
   const settings2 = {
     userId: '123456',
     title: 'Different Breathing Type',
@@ -37,7 +38,6 @@ describe('Settings API', () => {
     holdOut: 1,
     endTime: 16
   };
-
   const settings3 = {
     userId: '1234',
     title: 'Different Breathing Type',
@@ -49,8 +49,7 @@ describe('Settings API', () => {
     endTime: 16
   };
 
-
-  function postSettings(settings) {
+  function postSettings(settings: object) {
     return request
       .post('/api/v1/settings')
       .send(settings)
@@ -59,14 +58,11 @@ describe('Settings API', () => {
   }
 
   it('posts settings', () => {
-    return request
-      .post('/api/v1/settings')
-      .send(settings)
-      .expect(200)
-      .then(({ body }) => {
+    return postSettings(settings1)
+      .then((body: object) => {
         expect(body).toMatchInlineSnapshot(
           {
-            ...settings,
+            ...settings1,
             _id: expect.any(String)
           },
           `
@@ -88,7 +84,7 @@ describe('Settings API', () => {
   });
 
   it('gets settings', () => {
-    return postSettings(settings)
+    return postSettings(settings1)
       .then(() => {
         return request
           .get('/api/v1/settings?userId=5689')
@@ -126,8 +122,8 @@ describe('Settings API', () => {
   });
 
   it('puts new settings', () => {
-    return postSettings(settings)
-      .then(settings => {
+    return postSettings(settings1)
+      .then((settings: ISettingDocument) => {
         settings.title = 'new title';
         return request
           .put(`/api/v1/settings/${settings._id}`)
@@ -140,8 +136,8 @@ describe('Settings API', () => {
   });
 
   it('deletes a setting', () => {
-    return postSettings(settings)
-      .then(response => {
+    return postSettings(settings1)
+      .then((response: ISettingDocument) => {
         return request
           .delete(`/api/v1/settings/${response._id}`)
           .expect(200)

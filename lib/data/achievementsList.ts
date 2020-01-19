@@ -1,4 +1,4 @@
-module.exports = [
+export default [
   {
     qualifier: {
       streak: 1
@@ -47,5 +47,4 @@ module.exports = [
     img: 'https://raw.githubusercontent.com/mindDrift/mind-drift-fe/dev/src/assets/streakFIFTY.png',
     description: 'Congratulations, you completed a breathing session every day for the past 50 days!',
   }
-]
-;
+];
