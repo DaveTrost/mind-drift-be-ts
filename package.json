@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest --verbose --runInBand",
     "test:watch": "npm run test -- --watch",
+    "test:coverage": "npm run test -- --coverage",
     "compile": "tsc",
     "start": "tsc && node dist/server.js",
     "start:watch": "nodemon -e ts --exec \"npm run start\""
