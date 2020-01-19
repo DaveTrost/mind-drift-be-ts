@@ -1,25 +1,24 @@
-const { Router } = require('express');
-const Setting = require('../models/Setting');
+import { Router, Request, Response, NextFunction } from 'express';
+import { Setting } from '../models/Setting';
 
-module.exports = Router()
-  .get('/settings', ({ query }, res, next) => {
+export default Router()
+  .get('/settings', ({ query }: Request, res: Response, next: NextFunction) => {
     const settingsQuery = { $in: ['__default__', query.userId || ''] };
-
     Setting
       .find({ userId: settingsQuery })
       .then(settings => res.send(settings))
       .catch(next);
   })
 
-  .post('/settings', (req, res, next) => {
-    const { userId, title, description, inhale, holdIn, exhale, holdOut, endTime } = req.body;
+  .post('/settings', ({ body }: Request, res: Response, next: NextFunction) => {
+    const { userId, title, description, inhale, holdIn, exhale, holdOut, endTime } = body;
     Setting
       .create({ userId, title, description, inhale, holdIn, exhale, holdOut, endTime })
       .then(settings => res.send(settings))
       .catch(next);
   })
 
-  .put('/settings/:id', ({ params, body }, res, next) => {
+  .put('/settings/:id', ({ params, body }: Request, res: Response, next: NextFunction) => {
     Setting
       .findByIdAndUpdate(
         params.id,
@@ -29,10 +28,9 @@ module.exports = Router()
       .catch(next);
   })
 
-  .delete('/settings/:id', ({ params }, res, next) => {
+  .delete('/settings/:id', ({ params }: Request, res: Response, next: NextFunction) => {
     Setting
       .findByIdAndRemove(params.id)
       .then(deleted => res.json(deleted))
       .catch(next);
   });
-
