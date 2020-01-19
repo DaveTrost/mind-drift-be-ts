@@ -1,6 +1,11 @@
-const { Schema, model } = require('mongoose');
+import { Schema, Model, model, Aggregate } from 'mongoose';
+import { ISettingDocument } from '../interfaces/ISettingDocument';
 
-const schema = new Schema({
+interface ISetting extends ISettingDocument {};
+
+interface ISettingModel extends Model<ISetting> {};
+
+export const settingSchema: Schema = new Schema({
   userId: {
     type: String,
     required: true,
@@ -36,4 +41,5 @@ const schema = new Schema({
   },
 });
 
-module.exports = model('Settings', schema);
+export const Setting: ISettingModel = model<ISetting, ISettingModel>('Settings', settingSchema);
+export default Setting;
