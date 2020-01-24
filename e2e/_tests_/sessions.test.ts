@@ -1,14 +1,14 @@
 import dotenv from 'dotenv';
 import moment from 'moment';
 import request from '../request';
-import connect from '../../lib/utils/connect';
+import connect, { disconnect } from '../../lib/utils/connect';
 import { dropCollection, dropDatabase, closeConnection } from '../db';
 
 dotenv.config();
 
 describe('Sessions', () => {
-  beforeAll(() => {
-    connect(process.env.MONGODB_URI, { log: false });
+  beforeAll(async () => {
+    await connect(process.env.MONGODB_URI, { log: false });
   });
   beforeEach(async () => {
     await dropCollection('sessions');
@@ -18,6 +18,7 @@ describe('Sessions', () => {
   afterAll( async() => {
     await dropDatabase();
     await closeConnection();
+    await disconnect();
   });
 
   const session = {
