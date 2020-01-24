@@ -19,7 +19,7 @@ export default Router()
     Session
       .create({ start, duration, userId, moods })
       .then((session: ISessionDocument) => createdSession = session)
-      .then(() => User.schema.statics.updateStreak(userId, start))
+      .then(() => User.schema.statics.updateUser(userId, start, duration))
       .then(user => Achievement.schema.statics.updateUser(user))
       .then(() => res.send(createdSession))
       .catch(next);
