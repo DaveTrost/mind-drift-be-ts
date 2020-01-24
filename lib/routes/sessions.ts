@@ -15,10 +15,12 @@ export default Router()
 
   .post('/sessions', (req: Request, res: Response, next: NextFunction) => {
     const { start, duration, userId, moods } = req.body;
+    let createdSession: ISessionDocument = null;
     Session
       .create({ start, duration, userId, moods })
-      .then((session: ISessionDocument) => res.send(session))
+      .then((session: ISessionDocument) => createdSession = session)
       .then(() => User.schema.statics.updateStreak(userId, start))
       .then(user => Achievement.schema.statics.updateUser(user))
+      .then(() => res.send(createdSession))
       .catch(next);
   });
