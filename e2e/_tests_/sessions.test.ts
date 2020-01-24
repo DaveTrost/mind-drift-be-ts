@@ -21,14 +21,19 @@ describe('Sessions', () => {
     await disconnect();
   });
 
-  const session = {
+  const sessionDay0 = {
     start: new Date(),
     duration: 16,
     userId: '123456'
   };
-  const session2 = {
+  const sessionDay1 = {
     start: moment(new Date()).add(1, 'days'),
     duration: 24,
+    userId: '123456'
+  };
+  const sessionDay5 = {
+    start: moment(new Date()).add(5, 'days'),
+    duration: 40,
     userId: '123456'
   };
   const fake = {
@@ -46,11 +51,11 @@ describe('Sessions', () => {
   }
 
   it('posts a session', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then((body: object) => {
         expect(body).toMatchInlineSnapshot(
           {
-            ...session,
+            ...sessionDay0,
             __v: 0,
             _id: expect.any(String),
             start: expect.any(String)
@@ -69,7 +74,7 @@ describe('Sessions', () => {
   });
 
   it('gets a session', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
         return request.get('/api/v1/sessions?userId=123456').expect(200);
       })
@@ -79,8 +84,24 @@ describe('Sessions', () => {
       });
   });
 
+  it('gets all sessions', () => {
+    return postSession(sessionDay0)
+      .then(() => {
+        return postSession(sessionDay0);
+      })
+      .then(() => {
+        return postSession(sessionDay5);
+      })
+      .then(() => {
+        return request.get('/api/v1/sessions').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(3);
+      });
+  });
+
   it('finds a user after the session is posted', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
         return request.get('/api/v1/users?userId=123456').expect(200);
       })
@@ -104,9 +125,9 @@ describe('Sessions', () => {
   });
 
   it('posts 2 sessions and gets new achievements', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
-        return postSession(session2);
+        return postSession(sessionDay1);
       })
       .then(() => {
         return request.get('/api/v1/achievements/new?userId=123456').expect(200);
@@ -118,9 +139,9 @@ describe('Sessions', () => {
   });
 
   it('marks achievements as "delivered" after they are retrieved the first time', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
-        return postSession(session2);
+        return postSession(sessionDay1);
       })
       .then(() => {
         return request.get('/api/v1/achievements?userId=123456').expect(200);
@@ -135,9 +156,9 @@ describe('Sessions', () => {
   });
 
   it('can retrieve "all" achievements (marked delivered) after retrieving "new" achievements (marked undelivered)', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
-        return postSession(session2);
+        return postSession(sessionDay1);
       })
       .then(() => {
         return request.get('/api/v1/achievements/new?userId=123456').expect(200);
@@ -156,9 +177,9 @@ describe('Sessions', () => {
   });
 
   it('cannot retrieve any "new" achievements after retrieving "all" achievements', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
-        return postSession(session2);
+        return postSession(sessionDay1);
       })
       .then(() => {
         return request.get('/api/v1/achievements?userId=123456').expect(200);
@@ -175,9 +196,9 @@ describe('Sessions', () => {
   });
 
   it('gets average session time for a user', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
-        return postSession(session2);
+        return postSession(sessionDay1);
       })
       .then(() => {
         return request.get('/api/v1/users/averageTime?userId=123456').expect(200);
@@ -188,9 +209,9 @@ describe('Sessions', () => {
   });
 
   it('gets total session time for a user', () => {
-    return postSession(session)
+    return postSession(sessionDay0)
       .then(() => {
-        return postSession(session2);
+        return postSession(sessionDay1);
       })
       .then(() => {
         return request.get('/api/v1/users/totalTime?userId=123456').expect(200);
@@ -200,7 +221,7 @@ describe('Sessions', () => {
       });
   });
 
-  it('should get a 400', () => {
+  it('should get a 400 error', () => {
     return request
       .post('/api/v1/sessions')
       .send(fake)
