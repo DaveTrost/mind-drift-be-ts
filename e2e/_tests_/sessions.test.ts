@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import moment from 'moment';
 import request from '../request';
+import { postSession } from '../session-helper';
 import connect, { disconnect } from '../../lib/utils/connect';
 import { dropCollection, dropDatabase, closeConnection } from '../db';
 
@@ -41,15 +42,7 @@ describe('Sessions', () => {
     duration: {},
     userId: []
   };
-
-  function postSession(sessions: object) {
-    return request
-      .post('/api/v1/sessions')
-      .send(sessions)
-      .expect(200)
-      .then(({ body }) => body);
-  }
-
+  
   it('posts a session', () => {
     return postSession(sessionDay0)
       .then((body: object) => {
@@ -97,30 +90,6 @@ describe('Sessions', () => {
       })
       .then(({ body }) => {
         expect(body.length).toBe(3);
-      });
-  });
-
-  it('finds a user after the session is posted', () => {
-    return postSession(sessionDay0)
-      .then(() => {
-        return request.get('/api/v1/users?userId=123456').expect(200);
-      })
-      .then(({ body }) => {
-        expect(body[0]).toMatchInlineSnapshot(
-          {
-            _id: expect.any(String),
-            lastSessionDate: expect.any(String)
-          },
-          `
-            Object {
-              "__v": 0,
-              "_id": Any<String>,
-              "currentStreak": 1,
-              "lastSessionDate": Any<String>,
-              "userId": "123456",
-            }
-          `
-        );
       });
   });
 
@@ -192,32 +161,6 @@ describe('Sessions', () => {
       })
       .then(({ body }) => {
         expect(body.length).toBe(0);
-      });
-  });
-
-  it('gets average session time for a user', () => {
-    return postSession(sessionDay0)
-      .then(() => {
-        return postSession(sessionDay1);
-      })
-      .then(() => {
-        return request.get('/api/v1/users/averageTime?userId=123456').expect(200);
-      })
-      .then(({ body }) => {
-        expect(body[0].averageTime).toBe(20);
-      });
-  });
-
-  it('gets total session time for a user', () => {
-    return postSession(sessionDay0)
-      .then(() => {
-        return postSession(sessionDay1);
-      })
-      .then(() => {
-        return request.get('/api/v1/users/totalTime?userId=123456').expect(200);
-      })
-      .then(({ body }) => {
-        expect(body[0].totalTime).toBe(40);
       });
   });
 
