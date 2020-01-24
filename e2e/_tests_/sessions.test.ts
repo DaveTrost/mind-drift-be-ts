@@ -12,6 +12,7 @@ describe('Sessions', () => {
   });
   beforeEach(async () => {
     await dropCollection('sessions');
+    await dropCollection('users');
     await dropCollection('achievements');
   });
   afterAll( async() => {
@@ -107,9 +108,6 @@ describe('Sessions', () => {
         return postSession(session2);
       })
       .then(() => {
-        return request.get('/api/v1/users?userId=123456').expect(200);
-      })
-      .then(() => {
         return request.get('/api/v1/achievements/new?userId=123456').expect(200);
       })
       .then(({ body }) => {
@@ -118,27 +116,54 @@ describe('Sessions', () => {
       });
   });
 
-  it('posts 2 sessions, gets new achievements, gets all achievements', () => {
+  it('marks achievements as "delivered" after they are retrieved the first time', () => {
     return postSession(session)
       .then(() => {
         return postSession(session2);
       })
       .then(() => {
-        return request.get('/api/v1/users?userId=123456').expect(200);
-      })
-      .then(() => {
-        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
-      })
-      .then(() => {
-        // repeated the call to allow time for achievements to be marked as delivered
-        // this avoids an intermittent failure due to race condition
-        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+        return request.get('/api/v1/achievements?userId=123456').expect(200);
       })
       .then(() => {
         return request.get('/api/v1/achievements?userId=123456').expect(200);
       })
       .then(({ body }) => {
+        expect(body.length).toBeLessThanOrEqual(2);
         expect(body[0].delivered).toBe(true);
+      });
+  });
+
+  it('can retrieve "all" achievements (marked delivered) after retrieving "new" achievements (marked undelivered)', () => {
+    return postSession(session)
+      .then(() => {
+        return postSession(session2);
+      })
+      .then(() => {
+        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBeLessThanOrEqual(2);
+        expect(body[0].delivered).toBe(false);
+      })
+      .then(() => {
+        return request.get('/api/v1/achievements?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBeLessThanOrEqual(2);
+        expect(body[0].delivered).toBe(true);
+      });
+  });
+
+  it('cannot retrieve any "new" achievements after retrieving "all" achievements', () => {
+    return postSession(session)
+      .then(() => {
+        return postSession(session2);
+      })
+      .then(() => {
+        return request.get('/api/v1/achievements?userId=123456').expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBeLessThanOrEqual(2);
       })
       .then(() => {
         return request.get('/api/v1/achievements/new?userId=123456').expect(200);
