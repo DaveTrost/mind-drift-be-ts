@@ -16,12 +16,12 @@ describe('Sessions', () => {
     await dropCollection('users');
     await dropCollection('achievements');
   });
-  afterAll( async() => {
+  afterAll(async () => {
     await dropDatabase();
     await closeConnection();
     await disconnect();
   });
-
+  
   const sessionDay0 = {
     start: new Date(),
     duration: 16,
@@ -37,7 +37,7 @@ describe('Sessions', () => {
     duration: 40,
     userId: '123456'
   };
-  const fake = {
+  const badSessionData = {
     start: true,
     duration: {},
     userId: []
@@ -99,7 +99,9 @@ describe('Sessions', () => {
         return postSession(sessionDay1);
       })
       .then(() => {
-        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+        return request
+          .get('/api/v1/achievements/new?userId=123456')
+          .expect(200);
       })
       .then(({ body }) => {
         expect(body.length).toBeLessThanOrEqual(2);
@@ -107,7 +109,7 @@ describe('Sessions', () => {
       });
   });
 
-  it('marks achievements as "delivered" after they are retrieved the first time', () => {
+  it('marks achievements as **delivered** after they are retrieved the first time', () => {
     return postSession(sessionDay0)
       .then(() => {
         return postSession(sessionDay1);
@@ -124,13 +126,15 @@ describe('Sessions', () => {
       });
   });
 
-  it('can retrieve "all" achievements (marked delivered) after retrieving "new" achievements (marked undelivered)', () => {
+  it('can retrieve **all** achievements (marked delivered) after retrieving **new** achievements (marked undelivered)', () => {
     return postSession(sessionDay0)
       .then(() => {
         return postSession(sessionDay1);
       })
       .then(() => {
-        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+        return request
+          .get('/api/v1/achievements/new?userId=123456')
+          .expect(200);
       })
       .then(({ body }) => {
         expect(body.length).toBeLessThanOrEqual(2);
@@ -145,7 +149,7 @@ describe('Sessions', () => {
       });
   });
 
-  it('cannot retrieve any "new" achievements after retrieving "all" achievements', () => {
+  it('cannot retrieve any **new** achievements after retrieving **all** achievements', () => {
     return postSession(sessionDay0)
       .then(() => {
         return postSession(sessionDay1);
@@ -157,7 +161,9 @@ describe('Sessions', () => {
         expect(body.length).toBeLessThanOrEqual(2);
       })
       .then(() => {
-        return request.get('/api/v1/achievements/new?userId=123456').expect(200);
+        return request
+          .get('/api/v1/achievements/new?userId=123456')
+          .expect(200);
       })
       .then(({ body }) => {
         expect(body.length).toBe(0);
@@ -167,7 +173,7 @@ describe('Sessions', () => {
   it('should get a 400 error', () => {
     return request
       .post('/api/v1/sessions')
-      .send(fake)
+      .send(badSessionData)
       .expect(400);
   });
 });
