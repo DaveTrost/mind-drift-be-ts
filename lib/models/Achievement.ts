@@ -46,7 +46,6 @@ achievementSchema.static ('updateUser', async function(user: IUserDocument): Pro
 
   const newAchievements = masterAchievementsList
     .filter(({ qualifier, name }) => {
-      if(!qualifier.streak) return false;
       if(currentStreak < qualifier.streak) return false;
       if(oldAchievementNames.includes(name)) return false;
       return true;

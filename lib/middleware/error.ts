@@ -20,9 +20,6 @@ export default (err: ResponseError, req: Request, res: Response, next: NextFunct
     status = err.statusCode;
     error = err.error;
   }
-  else {
-    console.log('UNEXPECTED ERROR', err);
-  }
 
   res.status(status).send({ error });
 };

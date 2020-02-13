@@ -5,7 +5,7 @@ import { IUserDocument } from '../interfaces/IUserDocument';
 interface IUser extends IUserDocument {};
 
 interface IUserModel extends Model<IUser> {
-  updateStreak(userId: string, start: Date): Promise<IUserDocument>;
+  updateUser(userId: string, start: Date): Promise<IUserDocument>;
 };
 
 export const userSchema: Schema = new Schema({
@@ -20,16 +20,25 @@ export const userSchema: Schema = new Schema({
   currentStreak: {
     type: Number,
     required: true
+  },
+  totalTime: {
+    type: Number,
+    required: false
   }
 });
 
-userSchema.static('updateStreak', async function(userId: string, start: Date): Promise<IUserDocument> {
+userSchema.static('updateUser', async function(userId: string, start: Date, duration: number): Promise<IUserDocument> {
   const users = await User.find({ userId });
   if(!users.length) {
-    return User.create({ userId, lastSessionDate: start, currentStreak: 1 });
+    return User.create({ 
+      userId, 
+      lastSessionDate: start, 
+      currentStreak: 1, 
+      totalTime: duration 
+    });
   }
 
-  let { lastSessionDate, currentStreak } = users[0];
+  let { lastSessionDate, currentStreak, totalTime } = users[0];
 
   const difference = moment(start).diff(moment(lastSessionDate), 'days');
   switch(difference) {
@@ -43,7 +52,12 @@ userSchema.static('updateStreak', async function(userId: string, start: Date): P
   }
   return User.findOneAndUpdate(
     { userId }, 
-    { userId, lastSessionDate: start, currentStreak }, 
+    { 
+      userId, 
+      lastSessionDate: start, 
+      currentStreak, 
+      totalTime: totalTime + duration,
+    }, 
     { new: true }
   );
 });
